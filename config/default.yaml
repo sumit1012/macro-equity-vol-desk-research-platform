@@ -1,0 +1,214 @@
+database:
+  path: data/vol_radar.db
+
+history:
+  default_years: 5
+
+instruments:
+  # US
+  - ticker: SPY
+    name: "SPDR S&P 500 ETF"
+    asset_class: equity
+    region: US
+    country: US
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: QQQ
+    name: "Invesco QQQ Trust"
+    asset_class: equity
+    region: US
+    country: US
+    currency: USD
+    venue: NASDAQ
+    timezone: America/New_York
+  - ticker: IWM
+    name: "iShares Russell 2000 ETF"
+    asset_class: equity
+    region: US
+    country: US
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  # Europe
+  - ticker: VGK
+    name: "Vanguard FTSE Europe ETF"
+    asset_class: equity
+    region: Europe
+    country: EU
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: FEZ
+    name: "SPDR EURO STOXX 50 ETF"
+    asset_class: equity
+    region: Europe
+    country: EU
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: EWU
+    name: "iShares MSCI United Kingdom ETF"
+    asset_class: equity
+    region: Europe
+    country: GB
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: EWG
+    name: "iShares MSCI Germany ETF"
+    asset_class: equity
+    region: Europe
+    country: DE
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: EWQ
+    name: "iShares MSCI France ETF"
+    asset_class: equity
+    region: Europe
+    country: FR
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  # Asia
+  - ticker: EWJ
+    name: "iShares MSCI Japan ETF"
+    asset_class: equity
+    region: Asia
+    country: JP
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: FXI
+    name: "iShares China Large-Cap ETF"
+    asset_class: equity
+    region: Asia
+    country: CN
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: EWH
+    name: "iShares MSCI Hong Kong ETF"
+    asset_class: equity
+    region: Asia
+    country: HK
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: EWY
+    name: "iShares MSCI South Korea ETF"
+    asset_class: equity
+    region: Asia
+    country: KR
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+  - ticker: INDA
+    name: "iShares MSCI India ETF"
+    asset_class: equity
+    region: Asia
+    country: IN
+    currency: USD
+    venue: NYSE
+    timezone: America/New_York
+
+vol_indices:
+  - ticker: "^VIX"
+    name: "CBOE Volatility Index"
+    region: US
+    source: yahoo
+    related_instrument: SPY
+  - ticker: "^VIX9D"
+    name: "CBOE S&P 500 9-Day Volatility Index"
+    region: US
+    source: yahoo
+    related_instrument: SPY
+  - ticker: "^VIX3M"
+    name: "CBOE S&P 500 3-Month Volatility Index"
+    region: US
+    source: yahoo
+    related_instrument: SPY
+  - ticker: "^VSTOXX"
+    name: "EURO STOXX 50 Volatility Index"
+    region: Europe
+    source: upload
+    related_instrument: FEZ
+  - ticker: "^JNIV"
+    name: "Nikkei Volatility Index"
+    region: Asia
+    source: upload
+    related_instrument: EWJ
+  - ticker: "^VHSI"
+    name: "Hang Seng Volatility Index"
+    region: Asia
+    source: upload
+    related_instrument: FXI
+
+features:
+  rv_windows: [5, 21, 63]
+  vrp_horizons: [5, 21, 63]
+  zscore_lookback: 252
+  skew_tail_threshold: -2.0
+  skew_window: 63
+  vol_of_vol_window: 21
+  skew_weights: [0.5, 0.5]
+
+dislocation:
+  zscore_threshold: 2.5
+  spread_percentile: 95
+  inversion_persistence: 3
+  scorer_weights: [0.4, 0.3, 0.3]  # vrp, curve, skew
+  severity_thresholds:
+    medium: 40
+    high: 65
+    extreme: 85
+
+backtest:
+  initial_capital: 1000000
+  rebalance: daily
+  fill_method: next_open  # next_open or same_close
+  cost_model:
+    adv_buckets:
+      - min_adv: 1000000000
+        bps: 1
+      - min_adv: 100000000
+        bps: 3
+      - min_adv: 10000000
+        bps: 8
+      - min_adv: 0
+        bps: 15
+    fixed_fee_per_share: 0.005
+  risk:
+    max_gross_exposure: 1.0
+    region_cap: 0.4
+    vol_target: 0.10
+    drawdown_soft: -0.05
+    drawdown_hard: -0.10
+    regime_risk_off_scale: 0.3
+  strategy:
+    signal_cap: 3.0
+    ml_boost_high: 1.2
+    ml_boost_low: 0.8
+    ml_threshold_high: 0.6
+    ml_threshold_low: 0.4
+
+ml:
+  models: [logistic_regression, gradient_boosting]
+  target_horizon: 21
+  walk_forward_window: 252
+  random_seed: 42
+  gb_n_estimators: 100
+  gb_max_depth: 3
+
+etf_flows:
+  volume_shock_lookback: 63
+  volume_shock_threshold: 2.0
+
+dividends:
+  gap_window_days: 5
+  shock_threshold: 0.02
+
+logging:
+  level: INFO
+  structured: true
