@@ -1,4 +1,4 @@
-# Global Equity Volatility Dislocation Radar
+# Macro Equity Vol Desk Research Platform
 
 A quantitative research platform that monitors variance risk premium (VRP), implied volatility term structure, and skew proxies across 13 equity ETFs spanning US, European, and Asian markets. The system detects statistical dislocations in real-time, classifies market regimes, trains walk-forward ML models, and backtests systematic vol-carry strategies with full risk management.
 
